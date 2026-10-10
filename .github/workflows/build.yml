@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: readname
+  contents: read
 
 concurrency:
   group: build-${{ github.ref }}

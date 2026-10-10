@@ -1,0 +1,32 @@
+name: Reset project dari zip
+
+# Hapus isi repo (kecuali .git dan .github), lalu extract zip yang ada di root repo.
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cek zip
+        run: |
+          ls *.zip || { echo "::error::Gak ada file .zip di root repo"; exit 1; }
+
+      - name: Ganti isi repo dengan isi zip
+        run: |
+          mkdir /tmp/new
+          unzip -oq ./*.zip -d /tmp/new
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github -exec rm -rf {} +
+          cp -a /tmp/new/. .
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Reset project dari zip" || echo "Gak ada perubahan"
+          git push
